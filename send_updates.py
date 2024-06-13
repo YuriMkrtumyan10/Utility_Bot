@@ -3,7 +3,7 @@ import sqlite3
 from telegram import Bot
 from datetime import datetime
 from dotenv import load_dotenv
-from unidecode import unidecode
+import asyncio
 
 import os
 
@@ -160,7 +160,6 @@ async def send_updates_to_users():
                 mark_as_sent(user_id, j["diff"], j["category"])
 
 
-if __name__ == "__main__":
-    import asyncio
+def start():
     asyncio.run(send_updates_to_users())
     conn.close()

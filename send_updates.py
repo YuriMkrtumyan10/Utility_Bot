@@ -42,13 +42,15 @@ def format_water(el):
 
 def format_gas(el):
     addresses = re.sub(r',\s*(?=[^\d\s])', ',\n   • ', el[1])
+    time = el[2]
+    date = el[3]
     return {
         "diff": el[1],
         "message":  
                 f"""Բարև Ձեզ, հարգելի օգտատեր:
 
         🔥«Գազպրոմ Արմենիա» ՓԲԸ» ընկերությունը տեղեկացնում է, որ պլանային աշխատանքներ իրականացնելու նպատակով կդադարեցվի հետևյալ հասցեների գազամատակարարումը՝
-   • {addresses}""",
+   • {addresses} {time} {date} """,
         "category": 2 
     }
 
@@ -68,7 +70,7 @@ def get_water_utilities(address):
 
     cursor.execute("""
         SELECT id, streets FROM outages_water 
-        WHERE streets LIKE '%' || ? || '%'  AND `date` >= date('now')
+        WHERE streets LIKE '%' || ? || '%'  AND `date` >= date('now', '+4 hours')
     """, (address.title(),))
 
     outages = cursor.fetchall()
@@ -79,10 +81,10 @@ def get_water_utilities(address):
 
 def get_gas_utilities(address):
     cursor.execute("""
-        SELECT id, streets FROM outages_gas
-        WHERE LOWER(streets) LIKE '%' || LOWER(?) || '%'  AND `date` >= date('now')
+        SELECT id, streets, date, time FROM outages_gas
+        WHERE LOWER(streets) LIKE '%' || LOWER(?) || '%'  AND `date` >= date('now', '+4 hours')
     """, (address.title(),))
-    
+    print(address)
     outages = cursor.fetchall()
     r = []
     for i in outages:
@@ -92,7 +94,7 @@ def get_gas_utilities(address):
 def get_elect_utilities(address):
     cursor.execute("""
         SELECT id, streets FROM outages_elect
-        WHERE LOWER(streets) LIKE '%' || LOWER(?) || '%'  AND `date` >= date('now')
+        WHERE LOWER(streets) LIKE '%' || LOWER(?) || '%'  AND `date` >= date('now', '+4 hours')
     """, (address.title(),))
     
     outages = cursor.fetchall()
@@ -102,6 +104,7 @@ def get_elect_utilities(address):
     return r
 
 def get_utilities(address):
+    print('----')
     utilities = []
     utilities = utilities + get_water_utilities(address)
     utilities = utilities + get_gas_utilities(address)
@@ -163,3 +166,6 @@ async def send_updates_to_users():
 def start():
     asyncio.run(send_updates_to_users())
     conn.close()
+
+if __name__ == '__main__':
+    start()

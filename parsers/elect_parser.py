@@ -1,7 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-
+from helpers.helpers import armenian_date_to_ymd
+from helpers.db import upsert_elect
 def get_data(url):
     response = requests.get(url)
 
@@ -25,22 +26,34 @@ def get_data(url):
     else:
         return f"Failed to fetch the URL: {response.status_code}"
 
-def extract_segment(article_text):
+
+def extract_segments(article_text):
     start_phrase = "Երևան քաղաք՝"
     end_phrase = "մարզ"
 
-    start_index = article_text.find(start_phrase)
-    end_index = article_text.find(end_phrase, start_index)
+    # Create a regex pattern to find all segments and their corresponding dates
+    segment_date_pattern = re.compile(
+        f"«Հայաստանի էլեկտրական ցանցեր» փակ բաժնետիրական ընկերությունը տեղեկացնում է, որ(.*?)պլանային նորոգման աշխատանքներ իրականացնելու.*?({re.escape(start_phrase)}.*?{re.escape(end_phrase)})",
+        re.DOTALL
+    )
 
-    if start_index != -1 and end_index != -1:
-        segment = article_text[start_index:end_index + len(end_phrase)]
+    matches = segment_date_pattern.finditer(article_text)
+
+    segments_with_dates = []
+    for match in matches:
+        date = match.group(1).strip()
+        segment = match.group(2).strip()
         last_comma_index = segment.rfind(",")
         if last_comma_index != -1:
             segment = segment[:last_comma_index]
-        return segment
-    else:
-        return "Segment not found."
+        segments_with_dates.append({"content": segment, "date": date})
 
+    if segments_with_dates:
+        return segments_with_dates
+    else:
+        return [{"content": "Segment not found.", "date": "Date not found."}]
+
+    
 def extract_data(segment):
     segment = re.sub(r'\s+', ' ', segment)
     pattern = r"(\d{2}։\d{2}-\d{2}:\d{2})"
@@ -67,15 +80,20 @@ def extract_data(segment):
     # streets = ' '.join(street_matches)
 
 def run():
+    total_count = 0
     url = 'https://www.ena.am/Info.aspx?id=5&lang=1'  # Replace with the URL you want to scrape
     data = get_data(url)
-    segment = extract_segment(data)
-    result = extract_data(segment)
-    # print(result)
-    for i in result:
-        print(i['time'])
-        # print('-------------')
-        # print(i['time'])
-        print(i['streets'])
-    # print(result)
+    segment = extract_segments(data)
+    for i in segment:
+        i['date'] = armenian_date_to_ymd(i["date"])
+        result = extract_data(i["content"])
+        # print(result)
+        total_count += len(result)
+        for j in result:
+            # print(j['time'])
+            # print(i['time'])
+            # print(j['streets'])
+            upsert_elect(i['date'], j['time'], j['streets'], "Երևան")
+        # print(result)
+    print("total elect count: " + str(len(result)))
 # run()

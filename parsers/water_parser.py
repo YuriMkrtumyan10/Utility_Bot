@@ -2,15 +2,15 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
-from constants import armenian_months, districts
-from helpers import get_key_by_value, parse_date_time
-from db import upsert
+from helpers.constants import armenian_months, districts
+from helpers.helpers import get_key_by_value
+from helpers.db import upsert_water
 
 def get_data(url):
     response = requests.get(url)
     
     today = datetime.today()
-    day = 3 #today.day
+    day = today.day
     month = armenian_months[today.month - 1] + 'ի'
     today_armenian = f"{month} {day}-ին"
 
@@ -86,10 +86,10 @@ def parse_string(panel):
 url = 'https://interactive.vjur.am'  # Replace with the URL you want to scrape
 panel_group_items = get_data(url)
 def run():
+    print("total water count: " + str(len(panel_group_items)))
     for index, item in enumerate(panel_group_items):
         details = parse_string(item)
         # print(details['post_id'])
-        print(upsert(details))
+        upsert_water(details)
         # print(details['city'])
         # print(details['streets'])
-        print('_________________')

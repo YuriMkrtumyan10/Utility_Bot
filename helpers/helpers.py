@@ -1,5 +1,4 @@
 from datetime import datetime, date
-import re
 
 def get_key_by_value(dictionary, search_value):
     return next((key for key, value in dictionary.items() if value == search_value), None)
@@ -34,4 +33,4 @@ def armenian_date_to_ymd(date_str):
     date_obj = date(int(year), int(month), int(day))
 
     # Return the date in Y-m-d format
-    return date_obj.strftime("%Y-%m-%d")
+    return date_obj.strftime("%d-%m-%Y")

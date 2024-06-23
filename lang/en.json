@@ -1,0 +1,28 @@
+{
+    "welcome_message": "Welcome🇦🇲 \n\nThank you for choosing us 🥰 \n\nPlease add your address🏡 and we will help you stay informed in case of utility service outages in your area of ​​Yerevan🤝",
+    "change_language": "Your language has been changed into English",
+    "select_below": "Choose below:",
+    "add_address_command": "➕ Add new address ➕",
+    "delete_address_command": "❌ Delete address ❌",
+    "list_addresses_command": "📋 My addresses 📋",
+    "change_language_command": "🇦🇲 Languages 🇷🇺",
+    "support_command": "🛠️ Support 🛠️",
+
+    "go_back": "🔙 Go back 🔙",
+    "no_address_error_message": "🛑 You do not have an address 🛑 \n\nPlease click the «➕Add address➕» button to add an address✅",
+    "choose_address_to_delete": "❌ Select the address you want to delete ❌",
+    "address_successfully_deleted": "✅Address deleted successfully",
+
+   
+    "address_successfully_added_part1": "Your address ",
+    "address_successfully_added_part2": " added successfully ✅\n\nThank you🤗",
+
+    "add_your_address_message": "🙏Please enter your address🏠",
+    "address_in_armenian_error_message": "🙏Please enter your address in English🇺🇸",
+    "wrong_address_format": "🛑 Incorrect Format 🛑\n\nThe address must be entered in the following format: 'street name' + 'nomenclature'\nFor example: 'Komitas 22' or 'Halabyan 45/2' 😊",
+    "recheck_address_part1": "The address you entered is ",
+    "recheck_address_part2": "<b>🙏Please make sure the address and Format are correct👀 otherwise you won't receive utility outage notification 🤕 </b>\n\nConfirm your address 'Yes✅' or 'No❌'",
+    "try_again_message": "Try again 😩",
+    "select_province_message": "🏙️ Choose your administrative district 🏙️"
+
+}

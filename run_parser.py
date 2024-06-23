@@ -6,3 +6,5 @@ def start():
     gas_run()
     elect_run()
     water_run()
+
+start()

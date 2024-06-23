@@ -10,7 +10,7 @@ def get_data(url):
     response = requests.get(url)
     
     today = datetime.today()
-    day = today.day
+    day = today.day - 2 
     month = armenian_months[today.month - 1] + 'ի'
     today_armenian = f"{month} {day}-ին"
 

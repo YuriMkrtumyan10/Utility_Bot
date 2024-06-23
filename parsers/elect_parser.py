@@ -56,7 +56,7 @@ def extract_segments(article_text):
     
 def extract_data(segment):
     segment = re.sub(r'\s+', ' ', segment)
-    pattern = r"(\d{2}։\d{2}-\d{2}:\d{2})"
+    pattern = r"(\d{2}[:։]\d{2}[-]\d{2}[:։]\d{2})"
 
     # matches = re.findall(pattern, segment, re.DOTALL | re.MULTILINE)
     splits = re.split(pattern, segment)

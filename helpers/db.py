@@ -1,5 +1,6 @@
 import sqlite3
 import datetime
+import difflib
 
 conn = sqlite3.connect('utility_project.db')
 cursor = conn.cursor()
@@ -60,6 +61,9 @@ def upsert_elect(date, time, streets, city):
         cursor.execute(f"INSERT INTO outages_elect (streets, time, date, city) VALUES (?, ?, ?, ?)", (streets, time, date, city))
         conn.commit()
 
+
+def similarity_ratio(s1, s2):
+    return difflib.SequenceMatcher(None, s1, s2).ratio()
 
 def upsert_gas(date, streets, city):
     cursor = conn.cursor()

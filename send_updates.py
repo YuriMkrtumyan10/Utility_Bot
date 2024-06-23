@@ -4,9 +4,9 @@ from telegram import Bot
 from datetime import datetime
 from dotenv import load_dotenv
 import asyncio
-
 import os
-
+from bot.utils.utils import get_districts
+from bot.utils.translate import translate_from_armenian
 load_dotenv()
 
 # Initialize your bot with the token
@@ -29,39 +29,47 @@ def get_new_info_for_user(address):
     return new_info
 
 def format_water(el):
-    addresses = re.sub(r',\s*(?=[^\d\s])', ',\n   • ', el[1])
+    date = re.findall(r'\d{2}\.\d{2}\.\d{4}թ', el[1])
+    full_message = el[1].split("«")[1].split("Ընկերությունը հայցում ")[0].replace("որվթարային", "որ վթարային").replace("շենքերիջրամատակարարումը", "շենքերի ջրամատակարարումը")
     return {
         "diff": el[1],
         "message":
-                f"""Բարև Ձեզ, հարգելի օգտատեր:
+                f"""🙋🏼‍♂️Հարգելի օգտատեր:
 
-        🚰«Վեոլիա Ջուր» ընկերությունը տեղեկացնում է, որ վթարային աշխատանքներով պայմանավորված կդադարեցվի հետևյալ հասցեների ջրամատակարարումը
-   • {addresses}""",
+📅 {date[0]} 
+🚰 «{full_message}""",
         "category": 1 
     }
 
 def format_gas(el):
-    addresses = re.sub(r',\s*(?=[^\d\s])', ',\n   • ', el[1])
-    time = el[2]
-    date = el[3]
+    addresses = el[1]
+    addresses = re.sub(r"\b\w+\s+մարզի\b.*", "", addresses)
     return {
         "diff": el[1],
         "message":  
-                f"""Բարև Ձեզ, հարգելի օգտատեր:
+                f"""🙋🏼‍♂️Հարգելի օգտատեր:
 
-        🔥«Գազպրոմ Արմենիա» ՓԲԸ» ընկերությունը տեղեկացնում է, որ պլանային աշխատանքներ իրականացնելու նպատակով կդադարեցվի հետևյալ հասցեների գազամատակարարումը՝
-   • {addresses} {time} {date} """,
+🔥<b>«Գազպրոմ Արմենիա» ՓԲԸ» ընկերությունը տեղեկացնում է, որ պլանային աշխատանքներ իրականացնելու նպատակով կդադարեցվի հետևյալ հասցեների՝</b>
+   🚨{addresses}
+<b>գազամատակարարումը</b>""",
         "category": 2 
     }
 
 def format_elect(el):
-    addresses = re.sub(r',\s*(?=[^\d\sև])', ',\n   • ', el[1])
+    addresses = re.sub(r',\s*(?=[^\d\sև])', ',\n   📍 ', el[1])
+    time = el[2]
+    date = el[3]
     return {
         "diff": el[1],
-         "message": f"""Բարև Ձեզ, հարգելի օգտատեր: 🙋🏼‍♂️
+         "message": f"""🙋🏼‍♂️Հարգելի օգտատեր: 
 
-    ⚡️«Հայաստանի էլեկտրական ցանցեր» ընկերությունը տեղեկացնում է, որ ժամանակավորապես կդադարեցվի հետևյալ հասցեների էլեկտրամատակարարումը՝
-   • {addresses}""",
+💡 <b>«Հայաստանի էլեկտրական ցանցեր» ընկերությունը տեղեկացնում է, որ ժամանակավորապես</b>
+⏰ {time}
+📅 {date} 
+<b>կդադարեցվի հետևյալ հասցեների էլեկտրամատակարարումը՝</b>
+   📍 {addresses}
+
+  """,
         "category": 3
     }
 
@@ -69,11 +77,12 @@ def get_water_utilities(address):
     # normalized_address = unidecode(address).lower()
 
     cursor.execute("""
-        SELECT id, streets FROM outages_water 
-        WHERE streets LIKE '%' || ? || '%'  AND `date` >= date('now', '+4 hours')
-    """, (address.title(),))
-
+        SELECT id, full_message FROM outages_water 
+        WHERE streets LIKE '%' || ? || '%'
+    """, (address['address'],))
+    #  AND `date` >= date('now', '+4 hours')
     outages = cursor.fetchall()
+    print(outages)
     r = []
     for i in outages:
         r.append(format_water(i))
@@ -81,10 +90,11 @@ def get_water_utilities(address):
 
 def get_gas_utilities(address):
     cursor.execute("""
-        SELECT id, streets, date, time FROM outages_gas
-        WHERE LOWER(streets) LIKE '%' || LOWER(?) || '%'  AND `date` >= date('now', '+4 hours')
-    """, (address.title(),))
-    print(address)
+        SELECT id, streets FROM outages_gas
+        WHERE LOWER(streets) LIKE '%' || LOWER(?) || '%' AND `date` >= date('now', '+4 hours')
+
+    """,
+    (address['province'],))
     outages = cursor.fetchall()
     r = []
     for i in outages:
@@ -92,19 +102,20 @@ def get_gas_utilities(address):
     return r
 
 def get_elect_utilities(address):
+    print(address)
     cursor.execute("""
-        SELECT id, streets FROM outages_elect
+        SELECT id, streets, date, time FROM outages_elect
         WHERE LOWER(streets) LIKE '%' || LOWER(?) || '%'  AND `date` >= date('now', '+4 hours')
-    """, (address.title(),))
+    """, (address['address'],))
     
     outages = cursor.fetchall()
+    print(outages)
     r = []
     for i in outages:
         r.append(format_elect(i))
     return r
 
 def get_utilities(address):
-    print('----')
     utilities = []
     utilities = utilities + get_water_utilities(address)
     utilities = utilities + get_gas_utilities(address)
@@ -135,34 +146,36 @@ def message_not_sended(user_id, el):
 
 async def send_updates_to_users():
     cursor = conn.cursor()
+    cursor.execute("SELECT user_id, address_hy, province, language_code FROM user_addresses LEFT JOIN users ON user_addresses.user_id = users.id")
 
-    cursor.execute("SELECT `user_id`, address FROM user_addresses")
     user_addresses = cursor.fetchall()
 
     user_to_addresses = {}
-    for user_id, address in user_addresses:
+    for user_id, address, province, language_code in user_addresses:
         if user_id not in user_to_addresses:
             user_to_addresses[user_id] = []
-        user_to_addresses[user_id].append(address)
+        tmp = {}
+        tmp['address'] = address.replace('.', '').replace('։', '')
+        tmp['province'] = get_districts("hy")[province]
+        tmp['language_code'] = language_code
+        user_to_addresses[user_id].append(tmp)
 
     notifications = {}
-
     for user_id, addresses in user_to_addresses.items():
         notifications[user_id] = []
         for address in addresses:
             outages = get_utilities(address)
             if (outages):
-                notifications[user_id].append(outages)
-
-    for user_id, info in notifications.items():
-        for i in info:
-            for j in i:
-                if not(message_not_sended(user_id, j)):
-                    print('sended')
-                    await bot.send_message(chat_id=user_id, text=j["message"])
-                mark_as_sent(user_id, j["diff"], j["category"])
+                # notifications[user_id].append(outages)
+                for outage in outages:
+                    if not(message_not_sended(user_id, outage)):
+                        print('sended')
+                        await bot.send_message(chat_id=user_id, text=translate_from_armenian(outage["message"], address['language_code']), parse_mode='HTML')
+                    mark_as_sent(user_id, outage["diff"], outage["category"])
 
 
+    # for user_id, info in notifications.items():
+       
 def start():
     asyncio.run(send_updates_to_users())
     conn.close()

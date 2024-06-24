@@ -78,9 +78,8 @@ def get_water_utilities(address):
 
     cursor.execute("""
         SELECT id, full_message FROM outages_water 
-        WHERE streets LIKE '%' || ? || '%'
+        WHERE streets LIKE '%' || ? || '%' AND `date` >= date('now', '+4 hours')
     """, (address['address'],))
-    #  AND `date` >= date('now', '+4 hours')
     outages = cursor.fetchall()
     print(outages)
     r = []

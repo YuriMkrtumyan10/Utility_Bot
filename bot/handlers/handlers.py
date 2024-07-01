@@ -77,6 +77,6 @@ async def change_language(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     language = query.data.split('_')[2]
     cursor.execute("UPDATE users SET language_code = ? WHERE id = ?", (language, user_id))
     cursor.connection.commit()
+#    await context.bot.delete_message(chat_id=query.message.chat_id, message_id=query.message.message_id)
 
-    await query.edit_message_text(f"language changed")
-    await load_menu(update, context, 1)
+    await load_menu(update, context)

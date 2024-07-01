@@ -33,4 +33,4 @@ def armenian_date_to_ymd(date_str):
     date_obj = date(int(year), int(month), int(day))
 
     # Return the date in Y-m-d format
-    return date_obj.strftime("%d-%m-%Y")
+    return date_obj.strftime("%Y-%m-%d")

@@ -7,11 +7,15 @@ import asyncio
 import os
 from bot.utils.utils import get_districts
 from bot.utils.translate import translate_from_armenian
+from telegram.error import Forbidden
+import logging
+
 load_dotenv()
 
 # Initialize your bot with the token
 bot = Bot(token=os.getenv('TG_TOKEN'))
-conn = sqlite3.connect('utility_project.db')
+conn = sqlite3.connect('/opt/Utility_Bot/utility_project.db')
+# conn = sqlite3.connect('utility_project.db')
 cursor = conn.cursor()
 
 def get_new_info_for_user(address):
@@ -50,7 +54,8 @@ def format_gas(el):
                 f"""🙋🏼‍♂️Հարգելի օգտատեր:
 
 🔥<b>«Գազպրոմ Արմենիա» ՓԲԸ» ընկերությունը տեղեկացնում է, որ պլանային աշխատանքներ իրականացնելու նպատակով կդադարեցվի հետևյալ հասցեների՝</b>
-   🚨{addresses}
+  📅{el[2]}  
+  🚨{addresses}
 <b>գազամատակարարումը</b>""",
         "category": 2 
     }
@@ -63,7 +68,7 @@ def format_elect(el):
         "diff": el[1],
          "message": f"""🙋🏼‍♂️Հարգելի օգտատեր: 
 
-💡 <b>«Հայաստանի էլեկտրական ցանցեր» ընկերությունը տեղեկացնում է, որ ժամանակավորապես</b>
+💡 <b> «Հայաստանի էլեկտրական ցանցեր» ընկերությունը տեղեկացնում է, որ ժամանակավորապես</b>
 ⏰ {time}
 📅 {date} 
 <b>կդադարեցվի հետևյալ հասցեների էլեկտրամատակարարումը՝</b>
@@ -81,7 +86,6 @@ def get_water_utilities(address):
         WHERE streets LIKE '%' || ? || '%' AND `date` >= date('now', '+4 hours')
     """, (address['address'],))
     outages = cursor.fetchall()
-    print(outages)
     r = []
     for i in outages:
         r.append(format_water(i))
@@ -89,7 +93,7 @@ def get_water_utilities(address):
 
 def get_gas_utilities(address):
     cursor.execute("""
-        SELECT id, streets FROM outages_gas
+        SELECT id, streets, date FROM outages_gas
         WHERE LOWER(streets) LIKE '%' || LOWER(?) || '%' AND `date` >= date('now', '+4 hours')
 
     """,
@@ -101,14 +105,12 @@ def get_gas_utilities(address):
     return r
 
 def get_elect_utilities(address):
-    print(address)
     cursor.execute("""
         SELECT id, streets, date, time FROM outages_elect
         WHERE LOWER(streets) LIKE '%' || LOWER(?) || '%'  AND `date` >= date('now', '+4 hours')
     """, (address['address'],))
     
     outages = cursor.fetchall()
-    print(outages)
     r = []
     for i in outages:
         r.append(format_elect(i))
@@ -168,10 +170,15 @@ async def send_updates_to_users():
                 # notifications[user_id].append(outages)
                 for outage in outages:
                     if not(message_not_sended(user_id, outage)):
-                        print('sended')
-                        await bot.send_message(chat_id=user_id, text=translate_from_armenian(outage["message"], address['language_code']), parse_mode='HTML')
-                    mark_as_sent(user_id, outage["diff"], outage["category"])
-
+                        try:  # CHANGED
+                            #print(outage["message"])
+                            #print(translate_from_armenian(outage["message"], address['language_code']))
+                            
+                            await bot.send_message(chat_id=user_id, text=translate_from_armenian(outage["message"], address['language_code']), parse_mode='HTML')
+                            
+                            mark_as_sent(user_id, outage["diff"], outage["category"])
+                        except Forbidden:  # CHANGED
+                            logging.warning(f"Bot was blocked by user {user_id}. Skipping this user.")  # CHANGED
 
     # for user_id, info in notifications.items():
        

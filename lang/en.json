@@ -13,7 +13,7 @@
     "address_successfully_deleted": "✅Address deleted successfully",
     "address_successfully_added_part1": "Your address ",
     "address_successfully_added_part2": " added successfully ✅\n\nThank you🤗",
-    "add_your_address_message": "🙏Please enter your address🏠",
+    "add_your_address_message": "🙏Please enter your address🏠\n\nThe address must be entered in the following format: 'street name' + 'nomenclature'\nFor example: 'Komitas 22' or 'Halabyan 45/2' 😊",
     "address_in_armenian_error_message": "🙏Please enter your address in English🇺🇸",
     "wrong_address_format": "🛑 Incorrect Format 🛑\n\nThe address must be entered in the following format: 'street name' + 'nomenclature'\nFor example: 'Komitas 22' or 'Halabyan 45/2' 😊",
     "recheck_address_part1": "The address you entered is ",

@@ -43,7 +43,6 @@ def format_data(data):
         # row["time"] = first_string
         # row["message"] = second_string
         formated_data.append(row)
-
     return formated_data
 
 url = 'https://armenia-am.gazprom.com/notice/announcement/plan/'

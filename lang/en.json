@@ -7,6 +7,7 @@
     "list_addresses_command": "📋 My addresses 📋",
     "change_language_command": "🇦🇲 Languages 🇷🇺",
     "support_command": "🛠️ Support 🛠️",
+    "groupchat_command":  "🇦🇲 Group Chat 🇷🇺",
     "go_back": "🔙 Go back 🔙",
     "no_address_error_message": "🛑 You do not have an address 🛑 \n\nPlease click the «➕Add address➕» button to add an address✅",
     "choose_address_to_delete": "❌ Select the address you want to delete ❌",

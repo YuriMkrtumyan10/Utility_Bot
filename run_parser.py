@@ -6,11 +6,11 @@ from datetime import datetime
 
 def start():
     gas_run()
-    #elect_run()
-    #water_run()
+    elect_run()
+    water_run()
     print("---------------------------------------")
 
 print("---------------------------------------")
 print(f"Starting cron job at: {datetime.now()}")
-#start()
+start()
 print("---------------------------------------")

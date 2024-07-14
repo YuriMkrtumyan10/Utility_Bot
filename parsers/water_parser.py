@@ -11,8 +11,8 @@ def get_data(url):
     day = today.day 
     month = armenian_months[today.month - 1] + 'ի'
     today_armenian = f"{month} {day}-ին"
-
-    print(day)
+    #print (today_armenian)
+    #print(day)
     all_panel_group_texts = []
     page = 1
     found_today = True
@@ -35,8 +35,8 @@ def get_data(url):
         
         matched_panels = [
             panel for panel in panel_groups 
-            if today_armenian in panel.get_text(strip=True) 
-            and "Երևան" in panel.get_text(strip=True)
+            if today_armenian.lower() in panel.get_text(strip=True).lower() 
+            and "երևան" in panel.get_text(strip=True).lower()
         ]
         
         if not matched_panels:
@@ -69,9 +69,9 @@ def parse_string(panel):
     return details
 
 url = 'https://interactive.vjur.am'  # Replace with the URL you want to scrape
-panel_group_items = get_data(url)
 
 def run():
+    panel_group_items = get_data(url)
     print("total water count: " + str(len(panel_group_items)))
     for index, item in enumerate(panel_group_items):
         details = parse_string(item)

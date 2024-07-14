@@ -90,11 +90,14 @@ async def add_address(update: Update, context: CallbackContext) -> None:
         if lang != get_user_language_code(update.effective_user.id):  # 'hy' is the ISO 639-1 code for Armenian
             await update.message.reply_text(lang_loader.get_translation("address_in_armenian_error_message"))
             return
-        pattern = r"^\D+\s+\d+(?:/\d+)?$"
+        #pattern = r"^\D+\s+\d+(?:/\d+)?$"
+        #pattern = r"^\D+\s+\d+[a-zA-Z]?(?:/\d+)?$"
+        #pattern = r"^\D+\s+\d+([a-zA-Z]|/\d+)?$"
+        #pattern = r"^\D+\s+\d+([a-zA-Z]|(/\d+)?)?$"
 
-        match = re.match(pattern, user_address)
-        if not(match):
-            await update.message.reply_text(lang_loader.get_translation("wrong_address_format"), reply_markup=ReplyKeyboardRemove())
+        #match = re.match(pattern, user_address)
+        #if not(match):
+            #await update.message.reply_text(lang_loader.get_translation("wrong_address_format"), reply_markup=ReplyKeyboardRemove())
             return
         context.user_data["conversation_state"] = -1
 

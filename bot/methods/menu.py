@@ -12,7 +12,8 @@ async def load_menu(update, context, newMessage = -1):
         [InlineKeyboardButton(lang_loader.get_translation("delete_address_command"), callback_data="delete_address")],
         [InlineKeyboardButton(lang_loader.get_translation("list_addresses_command"), callback_data="list_addresses")],
         [InlineKeyboardButton(lang_loader.get_translation("change_language_command"), callback_data="change_language")],
-        [InlineKeyboardButton(lang_loader.get_translation("support_command"), url="https://t.me/komunal_anjatumnet_support")],
+        [InlineKeyboardButton(lang_loader.get_translation("support_command"), url="https://t.me/komunal_anjatumner_support")],
+        [InlineKeyboardButton(lang_loader.get_translation("groupchat_command"), url="https://t.me/komunal_anjatumner")],
     ]
     
     reply_markup = InlineKeyboardMarkup(keyboard)
